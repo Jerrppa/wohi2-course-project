@@ -1,0 +1,12 @@
+node_modules
+npm-debug.log
+coverage
+.env
+.env.test
+.git
+.gitignore
+.DS_Store
+cms-bruno
+src/generated
+public/uploads/*
+!public/uploads/.gitkeep

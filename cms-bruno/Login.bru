@@ -1,0 +1,23 @@
+meta {
+  name: Login
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/auth/login
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "email": "testi@esimerkki.fi",
+    "password": "oma_salainen_salasana"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

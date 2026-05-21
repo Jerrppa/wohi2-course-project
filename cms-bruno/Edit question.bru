@@ -1,0 +1,24 @@
+meta {
+  name: Edit question
+  type: http
+  seq: 1
+}
+
+put {
+  url: {{baseUrl}}/api/questions/1
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc3NzI4Njg1MiwiZXhwIjoxNzc3MjkwNDUyfQ.k7qBc1MBgryIoRB6k1yRC1gL8RcWpK8LhAqhwmruRbI
+}
+
+body:json {
+  {
+    "title": "Intro to HTTP",
+    "content": "Overwritten",
+    "date": "11-04-2026",
+    "keywords": ["uef"]
+  }
+}

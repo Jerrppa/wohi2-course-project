@@ -1,0 +1,16 @@
+meta {
+  name: Get-question
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/questions
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc3NzI4Njg1MiwiZXhwIjoxNzc3MjkwNDUyfQ.k7qBc1MBgryIoRB6k1yRC1gL8RcWpK8LhAqhwmruRbI
+}
+​
