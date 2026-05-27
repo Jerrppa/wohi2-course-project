@@ -41,6 +41,36 @@
       letter-spacing: 1px;
     }
 
+    .header-nav {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    /* Secondary Navigation Buttons (Leaderboard, Random Quiz) */
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 700;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: #ffd200;
+      color: #ffd200;
+    }
+
+    #nav-leaderboard-btn, #nav-random-btn {
+      display: none; /* Hidden by default, shown when logged in */
+    }
+
     #logout-btn {
       background: transparent;
       color: #ff6b6b;
@@ -597,7 +627,11 @@
 <body>
   <header>
     <h1>WOHII QUIZ</h1>
-    <button id="logout-btn">Log out</button>
+    <div class="header-nav">
+      <button class="btn-secondary" id="nav-random-btn">🎲 Random Quiz</button>
+      <button class="btn-secondary" id="nav-leaderboard-btn">🏆 Leaderboard</button>
+      <button id="logout-btn">Log out</button>
+    </div>
   </header>
 
   <main>
@@ -610,5 +644,28 @@
 
   <script src="config.js"></script>
   <script src="app.js"></script>
+  <script>
+    // To ensure the nav buttons are visible only when logged in,
+    // we hook into the existing app.js logic from here, or you can 
+    // update the showApp/showAuth functions inside app.js.
+    document.addEventListener("DOMContentLoaded", () => {
+      const logoutBtn = document.getElementById("logout-btn");
+      const randomBtn = document.getElementById("nav-random-btn");
+      const leaderboardBtn = document.getElementById("nav-leaderboard-btn");
+
+      // Set up an observer to watch when the logout button is displayed
+      // (which happens when showApp() is called in app.js).
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.attributeName === "style") {
+            const isVisible = logoutBtn.style.display !== "none";
+            randomBtn.style.display = isVisible ? "inline-block" : "none";
+            leaderboardBtn.style.display = isVisible ? "inline-block" : "none";
+          }
+        });
+      });
+      observer.observe(logoutBtn, { attributes: true });
+    });
+  </script>
 </body>
 </html>

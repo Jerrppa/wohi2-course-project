@@ -448,9 +448,96 @@ function handleLogout() {
 // --- Init ---
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("logout-btn").addEventListener("click", handleLogout);
+  
+  document.getElementById("nav-leaderboard-btn")?.addEventListener("click", showLeaderboard);
+  document.getElementById("nav-random-btn")?.addEventListener("click", playRandomQuiz);
+
   if (getToken()) {
     showApp();
   } else {
     showAuth();
   }
 });
+// ==========================================
+// LEADERBOARD (TULOSTAULU)
+// ==========================================
+async function showLeaderboard() {
+  const container = document.getElementById("questions-container");
+  container.innerHTML = '<p class="loading">Loading leaderboard...</p>';
+
+  try {
+    // Oletuksena reitti on /api/leaderboard. Muuta jos laitoit sen muualle!
+    const data = await apiFetch('/api/leaderboard'); 
+    
+    let html = `
+      <a href="#" id="back-btn" class="back-link">&larr; Back to questions</a>
+      <h2>🏆 Top 5 Players</h2>
+      <div class="leaderboard-container" style="background: var(--bg-color); padding: 2rem; border-radius: 8px;">
+        <ol style="font-size: 1.2rem; line-height: 2;">
+    `;
+
+    if (data.length === 0) {
+      html += "<p>No scores yet! Go play some questions!</p>";
+    } else {
+      data.forEach((player, index) => {
+        const medal = index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : "👏";
+        html += `<li><strong>${player.name}</strong> - ${player.score} points ${medal}</li>`;
+      });
+    }
+
+    html += `</ol></div>`;
+    container.innerHTML = html;
+
+    document.getElementById("back-btn").addEventListener("click", (e) => {
+      e.preventDefault();
+      loadQuestions();
+    });
+
+  } catch (err) {
+    container.innerHTML = `<p class="error">${err.message}</p>`;
+  }
+}
+
+// ==========================================
+// RANDOM QUIZ (SATUNNAISET 10 KYSYMYSTÄ)
+// ==========================================
+async function playRandomQuiz() {
+  const container = document.getElementById("questions-container");
+  container.innerHTML = '<p class="loading">Loading random questions...</p>';
+
+  try {
+    // Hakee sen /random reitin, jonka teimme aiemmin
+    const questions = await apiFetch(`${CONFIG.ROUTES.QUESTIONS}/random`);
+    
+    let html = `
+      <a href="#" id="back-btn" class="back-link">&larr; Back to questions</a>
+      <h2>🎲 Random Quiz Challenge!</h2>
+      <p>Here are 10 random questions. Good luck!</p>
+      <div class="random-quiz-list">
+    `;
+
+    questions.forEach(q => {
+      html += `
+        <article class="question-card ${q[CONFIG.API_FIELDS.SOLVED] ? "solved-card" : ""}">
+          <h3>${q.question} ${q[CONFIG.API_FIELDS.SOLVED] ? `<span class="badge-solved">Solved</span>` : ""}</h3>
+          <button class="btn btn-play" data-id="${q.id}">Play this question</button>
+        </article>
+      `;
+    });
+
+    html += `</div>`;
+    container.innerHTML = html;
+
+    document.getElementById("back-btn").addEventListener("click", (e) => {
+      e.preventDefault();
+      loadQuestions();
+    });
+
+    container.querySelectorAll(".btn-play").forEach((el) => {
+      el.addEventListener("click", () => playQuestion(el.dataset.id));
+    });
+
+  } catch (err) {
+    container.innerHTML = `<p class="error">${err.message}</p>`;
+  }
+}

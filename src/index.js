@@ -5,14 +5,17 @@ const prisma = require("./lib/prisma");
 const authRouter = require("./routes/auth");
 const path = require('path');
 const errorHandler = require("./middleware/errorHandler");
+const usersRouter = require("./routes/users");
 const PORT = process.env.PORT || 3000;
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 
-// everything under /api/posts
+// everything under /api/questions
 app.use(express.json());
 app.use("/api/auth", authRouter);
 app.use("/api/questions", questionRouter);
+app.use("/api/users", usersRouter);
+app.use('/api/leaderboard', require('./routes/leaderboard'));
 
 app.use((req, res) => {
   res.json({msg: "Not found"});

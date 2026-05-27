@@ -3,12 +3,13 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const prisma = require("../lib/prisma");
-const { ValidationError, ConflictError, ForbiddenError } = require("../lib/errors");
+const { ValidationError, ConflictError, ForbiddenError, UnauthorizedError } = require("../lib/errors");
 
 const SECRET = process.env.JWT_SECRET;
 // Here we will add all routes related to authentication
 // POST /api/auth/register
-router.post("/register", async (req, res) => {
+router.post("/register", async (req, res, next) => {
+try{
   const { email, password, name } = req.body;
 
   if (!email || !password || !name) {
@@ -18,7 +19,7 @@ router.post("/register", async (req, res) => {
   // Check if user already exists
   const existingUser = await prisma.user.findUnique({ where: { email },});
   if (existingUser) {
-    if (existing) throw new ConflictError("Email already registered");
+    if (existingUser) throw new ConflictError("Email already registered");
   }
 
   // Hash the password
@@ -36,9 +37,13 @@ router.post("/register", async (req, res) => {
     message: "User registered successfully",
     token,
   });
+  } catch (err) {
+    next(err); 
+  }
 });
 // POST /api/auth/login
-router.post("/login", async (req, res) => {
+router.post("/login", async (req, res, next) => {
+try{
   const { email, password } = req.body;
 
   if (!email || !password)
@@ -58,6 +63,10 @@ router.post("/login", async (req, res) => {
   const token = jwt.sign({ userId: user.id }, SECRET, { expiresIn: "1h" });
 
   res.json({ token });
+  } catch (err) {
+    console.error("LOGIN ERROR:", err);
+    next(err);
+  }
 });
 
 

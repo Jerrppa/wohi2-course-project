@@ -1,13 +1,17 @@
 const jwt = require("jsonwebtoken");
-const SECRET = process.env.JWT_SECRET;
 const { UnauthorizedError, ForbiddenError } = require("../lib/errors");
 
 function authenticate(req, res, next) {
-    const authHeader = req.headers.authorization;
+  const authHeader = req.headers.authorization;
+  
+  // Fetch SECRET here so we are 100% sure the .env file has loaded
+  const SECRET = process.env.JWT_SECRET;
 
   if (!authHeader?.startsWith("Bearer ")) {
-    throw new UnauthorizedError("No token provided" );
+    // Use next() to pass the error to your errorHandler
+    return next(new UnauthorizedError("No token provided"));
   }
+  
   const token = authHeader.split(" ")[1];
 
   try {
@@ -15,8 +19,15 @@ function authenticate(req, res, next) {
     req.user = decoded;
     next();
   } catch (err) {
-    req.log.console.warn({}, "Error authenticating");
-    throw new ForbiddenError("Invalid or expired token");
+    // Use either pino logger or standard console
+    if (req.log) {
+      req.log.warn({}, "Error authenticating");
+    } else {
+      console.warn("Error authenticating");
+    }
+    
+    // Pass the error forward to the errorHandler
+    return next(new ForbiddenError("Invalid or expired token"));
   }
 }
 
